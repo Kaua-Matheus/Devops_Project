@@ -1,10 +1,19 @@
-def calcular_total(itens, desconto_percentual=0):
-    """
-    Calcula o total de uma compra.
+CUPONS_PERCENTUAIS = {
+    "DEVOPS10": 10,
+    "BOASVINDAS5": 5,
+}
 
-    Cada item representa uma tupla no formato:
-    (preco_unitario, quantidade)
-    """
+def obter_desconto_do_cupom(cupom):
+    if cupom is None:
+        return 0
+
+    codigo = cupom.strip().upper()
+    if CUPONS_PERCENTUAIS.get(codigo) is None:
+        raise ValueError(f"Cupom promocional invalido.")
+    
+    return CUPONS_PERCENTUAIS[codigo]
+
+def calcular_total(itens, desconto_percentual=0, cupom=None):
     if not 0 <= desconto_percentual <= 100:
         raise ValueError("O desconto precisa estar entre 0 e 100.")
 
@@ -13,6 +22,8 @@ def calcular_total(itens, desconto_percentual=0):
         for preco_unitario, quantidade in itens
     )
 
-    total = subtotal - (subtotal * (desconto_percentual / 100))
-    #teste
+    desconto_total = desconto_percentual + obter_desconto_do_cupom(cupom)
+    desconto_total = min(desconto_total, 100)
+    total = subtotal * (1 - desconto_total / 100)
+
     return round(total, 2)
